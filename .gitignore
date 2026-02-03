@@ -1,0 +1,12 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Old unused script
+app.js
+
+# Editor settings
+.vscode/
+
+# Logs
+*.log
