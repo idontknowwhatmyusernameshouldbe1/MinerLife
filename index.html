@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MinerLife</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="wrap">
+    <h1>MinerLife</h1>
+    <p>A Minecraft-inspired voxel sandbox (original code + assets).</p>
+    <div class="buttons">
+      <a class="btn" href="#play">Play (soon)</a>
+      <a class="btn alt" href="https://github.com/YOURNAME/MinerLife" target="_blank" rel="noreferrer">GitHub</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="play" class="card">
+      <h2>Web Demo</h2>
+      <p>Demo placeholder. Next: add a WebGL canvas (Three.js/Babylon.js).</p>
+      <button id="clickme">Click me</button>
+      <p id="out"></p>
+    </section>
+
+    <section class="card">
+      <h2>Roadmap</h2>
+      <ul>
+        <li>Milestone 1: camera + movement</li>
+        <li>Milestone 2: voxel chunks</li>
+        <li>Milestone 3: place/break blocks</li>
+        <li>Milestone 4: save/load</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="wrap small">
+    <p>© <span id="year"></span> MinerLife. Not affiliated with Mojang/Microsoft.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
