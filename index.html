@@ -3,42 +3,51 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MinerLife</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>MinerLife (3D)</title>
+  <style>
+    html, body { margin:0; height:100%; overflow:hidden; background:#000; }
+    #hud {
+      position: fixed; left: 12px; top: 12px;
+      color: #fff; font-family: system-ui, Arial, sans-serif;
+      background: rgba(0,0,0,.45); padding: 10px 12px; border-radius: 10px;
+      user-select: none;
+    }
+    #crosshair {
+      position: fixed; left: 50%; top: 50%;
+      width: 10px; height: 10px; transform: translate(-50%, -50%);
+      border: 2px solid rgba(255,255,255,.9); border-radius: 50%;
+      pointer-events: none;
+    }
+    #blocker {
+      position: fixed; inset: 0;
+      display: grid; place-items: center;
+      background: rgba(0,0,0,.65);
+      color: white; font-family: system-ui, Arial, sans-serif;
+    }
+    button {
+      padding: 10px 14px; border-radius: 10px; border: 0;
+      background: #2f81f7; color: white; cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
-  <header class="wrap">
-    <h1>MinerLife</h1>
-    <p>A Minecraft-inspired voxel sandbox (original code + assets).</p>
-    <div class="buttons">
-      <a class="btn" href="#play">Play (soon)</a>
-      <a class="btn alt" href="https://github.com/Idontknowwhatmyusernameshouldbe1/MinerLife" target="_blank" rel="noreferrer">GitHub</a>
+  <div id="hud">
+    <div><b>MinerLife</b> (prototype)</div>
+    <div>WASD = move, Space = up, Shift = down</div>
+    <div>Click = remove, Right click = place</div>
+    <div>Esc = release mouse</div>
+  </div>
+  <div id="crosshair"></div>
+
+  <div id="blocker">
+    <div style="text-align:center">
+      <h1 style="margin:0 0 10px">MinerLife 3D</h1>
+      <p style="opacity:.9;margin:0 0 16px">Click to lock mouse and start.</p>
+      <button id="start">Start</button>
     </div>
-  </header>
+  </div>
 
-  <main class="wrap">
-    <section id="play" class="card">
-      <h2>Web Demo</h2>
-      <p>Demo placeholder. Next: add a WebGL canvas (Three.js/Babylon.js).</p>
-      <button id="clickme">Click me</button>
-      <p id="out"></p>
-    </section>
-
-    <section class="card">
-      <h2>Roadmap</h2>
-      <ul>
-        <li>Milestone 1: camera + movement</li>
-        <li>Milestone 2: voxel chunks</li>
-        <li>Milestone 3: place/break blocks</li>
-        <li>Milestone 4: save/load</li>
-      </ul>
-    </section>
-  </main>
-
-  <footer class="wrap small">
-    <p>© <span id="year"></span> MinerLife. Not affiliated with Mojang/Microsoft.</p>
-  </footer>
-
-  <script src="app.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
