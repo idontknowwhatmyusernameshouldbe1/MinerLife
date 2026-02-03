@@ -1,5 +1,5 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-import { PointerLockControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/PointerLockControls.js";
+import * as THREE from "three";
+import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 
 /**
  * MinerLife (tiny voxel prototype)
@@ -9,7 +9,6 @@ import { PointerLockControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/
  * - Right click: place block
  */
 
-// -------------------- basics --------------------
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0b0f14);
 
@@ -39,7 +38,6 @@ grid.position.y = 0;
 scene.add(grid);
 
 // -------------------- controls --------------------
-// IMPORTANT: use the canvas element for pointer lock (more reliable than document.body)
 const controls = new PointerLockControls(camera, renderer.domElement);
 
 const blocker = document.getElementById("blocker");
@@ -52,12 +50,12 @@ function requestLock() {
 
 startBtn.addEventListener("click", requestLock);
 
-// Also allow clicking the canvas to start (super reliable UX)
+// allow clicking the canvas to lock too
 renderer.domElement.addEventListener("click", () => {
   if (!controls.isLocked) requestLock();
 });
 
-// Update overlay UI
+// overlay updates
 controls.addEventListener("lock", () => (blocker.style.display = "none"));
 controls.addEventListener("unlock", () => (blocker.style.display = "grid"));
 
@@ -91,7 +89,7 @@ function removeBlock(x, y, z) {
   return blocks.delete(keyOf(x, y, z));
 }
 
-// Make a simple terrain: flat-ish with small hills
+// Terrain: flat-ish with small hills
 for (let x = 0; x < SIZE_X; x++) {
   for (let z = 0; z < SIZE_Z; z++) {
     const h =
@@ -109,41 +107,37 @@ const boxMat = new THREE.MeshStandardMaterial({
 });
 
 let instanced = null;
-
-// maps instanceId -> {x,y,z}
-let instanceToPos = [];
-// maps "x,y,z" -> instanceId
-let posToInstance = new Map();
+let instanceToPos = []; // instanceId -> {x,y,z}
 
 function rebuildInstances() {
   if (instanced) {
     scene.remove(instanced);
-    // geometry/material reused (we keep boxGeo/boxMat)
     instanced = null;
   }
 
   const count = blocks.size;
   instanced = new THREE.InstancedMesh(boxGeo, boxMat, count);
   instanced.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  instanced.frustumCulled = false; // small world; keep simple
+  instanced.frustumCulled = false;
   instanced.name = "voxels";
   scene.add(instanced);
 
   instanceToPos = new Array(count);
-  posToInstance = new Map();
 
   const dummy = new THREE.Object3D();
   let i = 0;
+
   for (const k of blocks) {
     const [x, y, z] = k.split(",").map(Number);
+
     dummy.position.set(x + 0.5, y + 0.5, z + 0.5);
     dummy.updateMatrix();
     instanced.setMatrixAt(i, dummy.matrix);
 
     instanceToPos[i] = { x, y, z };
-    posToInstance.set(k, i);
     i++;
   }
+
   instanced.instanceMatrix.needsUpdate = true;
 }
 
@@ -185,7 +179,7 @@ function tryPlace() {
 
   const hit = hits[0];
 
-  // Place on the face you hit: move a tiny bit along the normal from the hit point
+  // place just outside the hit face
   const placePoint = hit.point
     .clone()
     .add(hit.face.normal.clone().multiplyScalar(0.01));
@@ -211,7 +205,7 @@ function animate() {
   const dt = Math.min(clock.getDelta(), 0.05);
 
   if (controls.isLocked) {
-    // simple fly-style movement (no collision yet)
+    // fly-style movement (no collision yet)
     const speed = 8.0;
 
     const forward = new THREE.Vector3();
@@ -219,10 +213,9 @@ function animate() {
     forward.y = 0;
     forward.normalize();
 
-    const right = new THREE.Vector3()
-      .crossVectors(forward, new THREE.Vector3(0, 1, 0))
-      .normalize()
-      .multiplyScalar(-1);
+    // FIX: correct right vector so A/D are not swapped
+    const up = new THREE.Vector3(0, 1, 0);
+const right = new THREE.Vector3().crossVectors(forward, up).normalize();
 
     velocity.set(0, 0, 0);
     if (keys.has("KeyW")) velocity.add(forward);
@@ -232,16 +225,19 @@ function animate() {
     if (keys.has("Space")) velocity.y += 1;
     if (keys.has("ShiftLeft") || keys.has("ShiftRight")) velocity.y -= 1;
 
-    if (velocity.lengthSq() > 0) velocity.normalize().multiplyScalar(speed * dt);
+    if (velocity.lengthSq() > 0) {
+      velocity.normalize().multiplyScalar(speed * dt);
+    }
 
     controls.getObject().position.add(velocity);
 
-    // soft clamp above ground a bit
+    // keep camera above ground-ish
     controls.getObject().position.y = Math.max(1.2, controls.getObject().position.y);
   }
 
   renderer.render(scene, camera);
 }
+
 animate();
 
 window.addEventListener("resize", () => {
